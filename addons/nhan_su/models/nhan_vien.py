@@ -14,7 +14,9 @@ class NhanVien(models.Model):
     ho_ten_dem = fields.Char("Họ tên đệm", required=True)
     ten = fields.Char("Tên", required=True)
     ho_va_ten = fields.Char("Họ và tên", compute="_compute_ho_va_ten", store=True)
-    
+    luong_co_ban = fields.Float("Lương cơ bản", default=5000000)
+    dinh_muc_cong = fields.Integer("Định mức công tháng", default=26, help="Số ngày công chuẩn để tính lương")
+
     ngay_sinh = fields.Date("Ngày sinh")
     que_quan = fields.Char("Quê quán")
     email = fields.Char("Email")
