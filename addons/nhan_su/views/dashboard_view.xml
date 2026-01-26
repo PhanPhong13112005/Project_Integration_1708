@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_bang_luong_graph" model="ir.ui.view">
+            <field name="name">bang.luong.graph</field>
+            <field name="model">bang_luong</field>
+            <field name="arch" type="xml">
+                <graph string="Phân tích Lương" type="bar">
+                    <field name="nhan_vien_id" type="row"/>
+                    <field name="tong_thuc_linh" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <record id="view_bang_luong_pivot" model="ir.ui.view">
+            <field name="name">bang.luong.pivot</field>
+            <field name="model">bang_luong</field>
+            <field name="arch" type="xml">
+                <pivot string="Phân tích Lương">
+                    <field name="nhan_vien_id" type="row"/>
+                    <field name="thang" type="col"/>
+                    <field name="tong_thuc_linh" type="measure"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="action_dashboard_luong" model="ir.actions.act_window">
+            <field name="name">Biểu đồ Lương &amp; Chi phí</field>
+            <field name="res_model">bang_luong</field>
+            <field name="view_mode">graph,pivot,tree</field>
+            <field name="view_id" ref="view_bang_luong_graph"/>
+        </record>
+
+
+        <record id="view_cham_cong_graph" model="ir.ui.view">
+            <field name="name">cham.cong.graph</field>
+            <field name="model">cham_cong</field>
+            <field name="arch" type="xml">
+                <graph string="Thống kê Đi làm" type="bar" stacked="True">
+                    <field name="nhan_vien_id" type="row"/>
+                    <field name="cong_thuc_te" type="measure"/>
+                    <field name="so_gio_lam" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
+        <record id="action_dashboard_cham_cong" model="ir.actions.act_window">
+            <field name="name">Thống kê Chấm công</field>
+            <field name="res_model">cham_cong</field>
+            <field name="view_mode">graph,pivot</field>
+            <field name="view_id" ref="view_cham_cong_graph"/>
+        </record>
+
+
+        <menuitem id="menu_reporting"
+                  name="Báo cáo &amp; Dashboard"
+                  parent="menu_root"
+                  sequence="90"/>
+
+        <menuitem id="menu_report_luong"
+                  name="Phân tích Chi phí Lương"
+                  parent="menu_reporting"
+                  action="action_dashboard_luong"
+                  sequence="1"/>
+
+        <menuitem id="menu_report_cham_cong"
+                  name="Thống kê Chấm công"
+                  parent="menu_reporting"
+                  action="action_dashboard_cham_cong"
+                  sequence="2"/>
+    </data>
+</odoo>

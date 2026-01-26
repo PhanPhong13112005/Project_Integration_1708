@@ -7,3 +7,4 @@ access_chung_chi_bang_cap,chung_chi_bang_cap.chung_chi_bang_cap,model_chung_chi_
 access_danh_sach_chung_chi_bang_cap,danh_sach_chung_chi_bang_cap.danh_sach_chung_chi_bang_cap,model_danh_sach_chung_chi_bang_cap,base.group_user,1,1,1,1
 access_cham_cong,cham_cong,model_cham_cong,base.group_user,1,1,1,1
 access_bang_luong,bang_luong,model_bang_luong,base.group_user,1,1,1,1
+access_ns_du_bao,ns.du.bao,model_ns_du_bao,base.group_user,1,1,1,1

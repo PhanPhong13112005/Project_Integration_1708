@@ -34,17 +34,16 @@
                   parent="menu_root"
                   sequence="2"/>
 
-        <menuitem id="menu_cham_cong_action"
-                  name="Dữ liệu Chấm công"
-                  parent="menu_nghiep_vu_luong"
-                  action="action_cham_cong"
+        <menuitem id="menu_du_bao_ai" 
+                  name="Phân tích &amp; Dự báo" 
+                  parent="menu_root" 
+                  sequence="3"/>
+        
+        <menuitem id="menu_du_bao_action" 
+                  name="Dự báo Nghỉ việc (AI)" 
+                  parent="menu_du_bao_ai" 
+                  action="action_du_bao"
                   sequence="1"/>
-
-        <menuitem id="menu_bang_luong_action"
-                  name="Bảng lương tháng"
-                  parent="menu_nghiep_vu_luong"
-                  action="action_bang_luong"
-                  sequence="2"/>
 
         <menuitem id="menu_configuration"
                   name="Danh mục &amp; Cấu hình"
@@ -64,7 +63,7 @@
                   action="action_chuc_vu"/>
 
         <menuitem id="menu_chung_chi_bang_cap" 
-                  name="Loại Chứng chỉ, Bằng cấp" 
+                  name="Loại Chứng chỉ" 
                   parent="menu_configuration" 
                   sequence="3"
                   action="action_chung_chi_bang_cap"/>

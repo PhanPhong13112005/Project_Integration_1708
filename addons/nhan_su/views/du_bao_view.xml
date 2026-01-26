@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_du_bao_tree" model="ir.ui.view">
+            <field name="name">ns.du.bao.tree</field>
+            <field name="model">ns.du.bao</field>
+            <field name="arch" type="xml">
+                <tree string="Dự báo nghỉ việc" decoration-danger="muc_do_canh_bao == 'cao'" decoration-warning="muc_do_canh_bao == 'trung_binh'" decoration-success="muc_do_canh_bao == 'thap'">
+                    <field name="nhan_vien_id"/>
+                    <field name="luong_hien_tai" widget="monetary"/>
+                    <field name="so_lan_di_muon_thang_nay"/>
+                    <field name="diem_rui_ro" widget="progressbar"/>
+                    <field name="muc_do_canh_bao" widget="badge" 
+                           decoration-danger="muc_do_canh_bao == 'cao'" 
+                           decoration-warning="muc_do_canh_bao == 'trung_binh'" 
+                           decoration-success="muc_do_canh_bao == 'thap'"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_du_bao_form" model="ir.ui.view">
+            <field name="name">ns.du.bao.form</field>
+            <field name="model">ns.du.bao</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                          <button string="Chạy Phân tích AI" 
+                            type="object" 
+                            name="action_analyze_risk" 
+                            class="oe_highlight"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_title">
+                            <h1><field name="nhan_vien_id" placeholder="Chọn nhân viên để phân tích..."/></h1>
+                        </div>
+                        <group>
+                            <group string="Dữ liệu đầu vào (Features)">
+                                <field name="luong_hien_tai"/>
+                                <field name="so_lan_di_muon_thang_nay"/>
+                                <field name="tham_nien_thang"/>
+                            </group>
+                            <group string="Kết quả Dự báo (Prediction)">
+                                <field name="diem_rui_ro" widget="percentpie"/>
+                                <field name="muc_do_canh_bao" widget="badge" decoration-danger="muc_do_canh_bao == 'cao'"/>
+                            </group>
+                        </group>
+                        <separator string="Phân tích chi tiết nguyên nhân"/>
+                        <field name="phan_tich_chi_tiet" readonly="1"/>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_du_bao" model="ir.actions.act_window">
+            <field name="name">Dự báo Nghỉ việc (AI)</field>
+            <field name="res_model">ns.du.bao</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_du_bao_ai" 
+                  name="Phân tích &amp; Dự báo" 
+                  parent="menu_root" 
+                  sequence="90"/>
+        
+        <menuitem id="menu_du_bao_action" 
+                  name="Dự báo Nghỉ việc" 
+                  parent="menu_du_bao_ai" 
+                  action="action_du_bao"/>
+    </data>
+</odoo>
