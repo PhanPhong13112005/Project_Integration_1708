@@ -1,22 +1,46 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.ensemble import RandomForestClassifier
+import os
 import joblib
+from sklearn.ensemble import RandomForestClassifier
+import sys
 
-# 1. Đọc dữ liệu
-data = pd.read_csv('data_train.csv')
+# --- BƯỚC 1: XÁC ĐỊNH ĐƯỜNG DẪN TUYỆT ĐỐI ---
+# Lấy đường dẫn của chính file train_ai.py này (.../nhan_su/notebook/)
+base_dir = os.path.dirname(os.path.abspath(__file__))
 
-# 2. CHỈ CHỌN 3 CỘT SỐ LIỆU NÀY ĐỂ AI HỌC (Bỏ qua tên và tháng)
-X = data[['so_gio_lam', 'so_lan_muon', 'nghi_khong_phep']]
-y = data['label']
+# Đường dẫn file CSV (nhảy ra ngoài notebook/ để vào data/raw/)
+csv_path = os.path.join(base_dir, '..', 'data', 'raw', 'data_train.csv')
 
-# 3. Chia tập huấn luyện
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Đường dẫn lưu file Model .pkl (nhảy ra ngoài notebook/ để vào data/outputs/)
+model_output_path = os.path.join(base_dir, '..', 'data', 'outputs', 'model_du_bao_nghi_viec.pkl')
 
-# 4. Huấn luyện AI
-model = RandomForestClassifier(n_estimators=100, random_state=42)
-model.fit(X_train, y_train)
+print(f"--- Đang đọc dữ liệu từ: {csv_path} ---")
 
-# 5. Lưu não bộ AI
-joblib.dump(model, 'model_du_bao_nghi_viec.pkl')
-print("✅ Huấn luyện thành công! AI đã tìm ra quy luật nghỉ việc.")
+# Kiểm tra file CSV có tồn tại không
+if not os.path.exists(csv_path):
+    print(f"LỖI: Không tìm thấy file {csv_path}")
+    sys.exit(1)
+
+# --- BƯỚC 2: HUẤN LUYỆN ---
+try:
+    data = pd.read_csv(csv_path)
+    
+    # Chọn các cột đặc trưng (Features) và nhãn (Label)
+    # Lưu ý: Tên cột phải khớp với file CSV bạn đã xuất từ cham_cong.py
+    X = data[['so_gio_lam', 'so_lan_muon', 'nghi_khong_phep']]
+    y = data['label']
+
+    # Khởi tạo mô hình
+    model = RandomForestClassifier(n_estimators=100, random_state=42)
+    model.fit(X, y)
+
+    # --- BƯỚC 3: LƯU MÔ HÌNH ---
+    # Tạo thư mục outputs nếu chưa có
+    os.makedirs(os.path.dirname(model_output_path), exist_ok=True)
+    
+    joblib.dump(model, model_output_path)
+    print(f"--- HUẤN LUYỆN THÀNH CÔNG! Đã lưu tại: {model_output_path} ---")
+
+except Exception as e:
+    print(f"LỖI TRONG QUÁ TRÌNH HUẤN LUYỆN: {str(e)}")
+    sys.exit(1)

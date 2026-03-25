@@ -1,8 +1,12 @@
 # file: nhan_su/models/cham_cong.py
+import csv
+import os
+
 import requests
 from odoo import models, fields, api
 from odoo.exceptions import UserError, ValidationError
 from datetime import datetime, time, timedelta
+
 
 
 class ChamCong(models.Model):
@@ -161,3 +165,28 @@ class ChamCong(models.Model):
                 'ghi_chu': f"✅ Check-in: {fields.Datetime.context_timestamp(self, now).strftime('%H:%M')}"
             })
             return "in"
+    def action_xuat_csv_huan_luyen(self):
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        csv_path = os.path.join(base_dir, 'data/raw/data_train.csv')
+        os.makedirs(os.path.dirname(csv_path), exist_ok=True)
+
+        nhan_viens = self.env['nhan_vien'].search([])
+        try:
+            with open(csv_path, mode='w', newline='', encoding='utf-8') as file:
+                writer = csv.writer(file)
+                writer.writerow(['nhan_vien', 'so_gio_lam', 'so_lan_muon', 'nghi_khong_phep', 'label'])
+                for nv in nhan_viens:
+                    ccs = self.search([('nhan_vien_id', '=', nv.id)])
+                    if not ccs: continue
+                    tong_gio = sum(ccs.mapped('so_gio_lam'))
+                    so_lan_muon = len(ccs.filtered(lambda x: x.di_muon))
+                    label = 1 if so_lan_muon >= 5 else 0
+                    writer.writerow([nv.ho_va_ten, tong_gio, so_lan_muon, 0, label])
+            
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {'title': 'Thành công', 'message': f'Đã lưu file CSV tại {csv_path}', 'type': 'success'}
+            }
+        except Exception as e:
+            raise UserError(f"Lỗi xuất file: {str(e)}")

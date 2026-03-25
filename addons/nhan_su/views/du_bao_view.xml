@@ -5,7 +5,7 @@
             <field name="name">ns.du.bao.graph</field>
             <field name="model">ns.du.bao</field>
             <field name="arch" type="xml">
-                <graph string="Biểu đồ Phân tích Rủi ro Nghỉ việc" type="bar">
+                <graph string="Dự báo nghỉ việc" type="bar">
                     <field name="nhan_vien_id" type="row"/>
                     <field name="diem_rui_ro" type="measure"/>
                 </graph>
@@ -16,18 +16,13 @@
             <field name="name">ns.du.bao.tree</field>
             <field name="model">ns.du.bao</field>
             <field name="arch" type="xml">
-                <tree string="Danh sách dự báo" decoration-danger="muc_do_canh_bao=='nguy_hiem'" decoration-warning="muc_do_canh_bao=='canh_bao'">
+                <tree string="Dự báo" decoration-danger="muc_do_canh_bao=='nguy_hiem'">
                     <header>
-                        <button name="action_chay_du_bao_hang_loat" type="object" string="🚀 AI Quét Dự báo Toàn bộ Công ty" class="btn-danger"/>
+                        <button name="action_train_and_predict" type="object" string="🔄 Huấn luyện &amp; Dự báo AI" class="oe_highlight"/>
                     </header>
-                    <field name="nhan_vien_id" widget="many2one_avatar"/>
-                    <field name="so_gio_lam"/>
-                    <field name="so_lan_muon"/>
-                    <field name="diem_rui_ro" widget="progressbar" string="Tỷ lệ rủi ro (%)"/>
-                    <field name="muc_do_canh_bao" widget="badge" 
-                           attrs="{'decoration-success': [('muc_do_canh_bao', '=', 'an_toan')],
-                                   'decoration-warning': [('muc_do_canh_bao', '=', 'canh_bao')],
-                                   'decoration-danger': [('muc_do_canh_bao', '=', 'nguy_hiem')]}"/>
+                    <field name="nhan_vien_id"/>
+                    <field name="diem_rui_ro" widget="progressbar"/>
+                    <field name="muc_do_canh_bao" widget="badge"/>
                 </tree>
             </field>
         </record>
@@ -36,26 +31,17 @@
             <field name="name">ns.du.bao.form</field>
             <field name="model">ns.du.bao</field>
             <field name="arch" type="xml">
-                <form string="Hồ sơ phân tích AI">
+                <form>
                     <header>
-                        <button name="action_tu_dong_lay_du_lieu" string="🤖 Lấy số liệu Chấm công" type="object" class="oe_highlight"/>
+                        <button name="action_tu_dong_lay_du_lieu" string="🤖 Lấy số liệu Chấm công" type="object"/>
                     </header>
                     <sheet>
                         <group>
-                            <group string="Dữ liệu đầu vào">
-                                <field name="nhan_vien_id" options="{'no_create': True}"/>
-                                <field name="so_gio_lam"/>
-                                <field name="so_lan_muon"/>
-                                <field name="nghi_khong_phep"/>
-                            </group>
-                            <group string="Kết quả AI">
-                                <field name="diem_rui_ro" widget="progressbar"/>
-                                <field name="muc_do_canh_bao" widget="badge" 
-                                       attrs="{'decoration-success': [('muc_do_canh_bao', '=', 'an_toan')],
-                                               'decoration-warning': [('muc_do_canh_bao', '=', 'canh_bao')],
-                                               'decoration-danger': [('muc_do_canh_bao', '=', 'nguy_hiem')]}"/>
-                                <field name="phan_tich_chi_tiet" readonly="1"/>
-                            </group>
+                            <field name="nhan_vien_id"/>
+                            <field name="so_gio_lam"/>
+                            <field name="so_lan_muon"/>
+                            <field name="diem_rui_ro" widget="progressbar"/>
+                            <field name="phan_tich_chi_tiet"/>
                         </group>
                     </sheet>
                 </form>
@@ -63,7 +49,7 @@
         </record>
 
         <record id="action_du_bao_nghi_viec" model="ir.actions.act_window">
-            <field name="name">AI Dự báo Nghỉ việc</field>
+            <field name="name">Dự báo Nghỉ việc</field>
             <field name="res_model">ns.du.bao</field>
             <field name="view_mode">graph,tree,form</field>
         </record>

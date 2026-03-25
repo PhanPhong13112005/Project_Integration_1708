@@ -6,6 +6,12 @@
             <field name="model">cham_cong</field>
             <field name="arch" type="xml">
                 <tree string="Chấm công" decoration-muted="di_muon==True" create="0">
+                    <header>
+                        <button name="action_xuat_csv_huan_luyen" 
+                                type="object" 
+                                string="💾 Lưu Dữ liệu Huấn luyện AI (CSV)" 
+                                class="oe_highlight"/>
+                    </header>
                     <field name="nhan_vien_id" string="Nhân viên" widget="many2one_avatar"/>
                     <field name="check_in" string="Giờ vào"/>
                     <field name="check_out" string="Giờ ra"/>
@@ -133,6 +139,7 @@
                 </graph>
             </field>
         </record>
+
 
         <menuitem id="menu_ql_cham_cong" 
                   name="Chấm công &amp; Lương"
