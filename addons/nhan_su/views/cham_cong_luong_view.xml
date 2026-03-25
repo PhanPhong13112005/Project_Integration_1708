@@ -5,12 +5,15 @@
             <field name="name">cham.cong.tree</field>
             <field name="model">cham_cong</field>
             <field name="arch" type="xml">
-                <tree string="Chấm công">
-                    <field name="check_in"/>
-                    <field name="nhan_vien_id"/>
-                    <field name="so_gio_lam" widget="float_time"/>
-                    <field name="cong_thuc_te"/>
-                    <field name="di_muon"/>
+                <tree string="Chấm công" decoration-muted="di_muon==True" create="0">
+                    <field name="nhan_vien_id" string="Nhân viên" widget="many2one_avatar"/>
+                    <field name="check_in" string="Giờ vào"/>
+                    <field name="check_out" string="Giờ ra"/>
+                    <field name="so_gio_lam" widget="float_time" string="Thời gian làm"/>
+                    <field name="cong_thuc_te" string="Công quy đổi" sum="Tổng công"/>
+                    <field name="di_muon_text" string="Đi Muộn" widget="badge" decoration-muted="di_muon==True" decoration-success="di_muon==False"/>
+                    <field name="phut_di_muon" string="Muộn (phút)" sum=" "/> 
+                    <field name="di_muon" invisible="1"/>
                 </tree>
             </field>
         </record>
@@ -20,12 +23,19 @@
             <field name="model">cham_cong</field>
             <field name="arch" type="xml">
                 <form>
+                    <header>
+                        <button string="Gửi nhắc nhở Telegram" 
+                                type="object" 
+                                name="action_send_telegram_nhac_nho" 
+                                class="oe_highlight" 
+                                attrs="{'invisible': [('di_muon', '=', False)]}"/>
+                    </header>
                     <sheet>
                         <group>
                             <group string="Thông tin chính">
-                                <field name="nhan_vien_id"/>
-                                <field name="check_in"/>
-                                <field name="check_out"/>
+                                <field name="nhan_vien_id" readonly="1"/>
+                                <field name="check_in" readonly="1"/>
+                                <field name="check_out" readonly="1"/>
                             </group>
                             <group string="Kết quả">
                                 <field name="so_gio_lam" widget="float_time"/>
@@ -58,6 +68,12 @@
             <field name="model">bang_luong</field>
             <field name="arch" type="xml">
                 <form>
+                    <header>
+                        <button string="Gửi thông báo Lương (Telegram)" 
+                                type="object" 
+                                name="action_send_telegram_luong" 
+                                class="oe_highlight"/>
+                    </header>
                     <sheet>
                         <div class="oe_title">
                             <h1><field name="name" readonly="1"/></h1>
@@ -94,10 +110,40 @@
             <field name="view_mode">tree,form</field>
         </record>
 
+        <record id="action_server_diem_danh" model="ir.actions.server">
+            <field name="name">Mở Camera Điểm Danh Tự Động</field>
+            <field name="model_id" ref="model_cham_cong"/>
+            <field name="state">code</field>
+            <field name="code">
+                action = {
+                    'type': 'ir.actions.act_url',
+                    'url': '/nhan_su/face_scan_kiosk',
+                    'target': 'new',
+                }
+            </field>
+        </record>
+
+        <record id="view_cham_cong_graph" model="ir.ui.view">
+            <field name="name">cham.cong.graph</field>
+            <field name="model">cham_cong</field>
+            <field name="arch" type="xml">
+                <graph string="Thống kê chấm công" type="bar">
+                    <field name="nhan_vien_id"/>
+                    <field name="phut_di_muon" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
         <menuitem id="menu_ql_cham_cong" 
                   name="Chấm công &amp; Lương"
                   parent="nhan_su.menu_root" 
                   sequence="20"/>
+
+        <menuitem id="menu_action_diem_danh_cam" 
+                  name="Chấm công" 
+                  parent="menu_ql_cham_cong" 
+                  action="action_server_diem_danh" 
+                  sequence="0"/>
 
         <menuitem id="menu_action_cham_cong" 
                   name="Dữ liệu chấm công" 

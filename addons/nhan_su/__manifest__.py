@@ -28,6 +28,7 @@
         'views/chuc_vu.xml',
         'views/don_vi.xml',
         'views/nhan_vien.xml',
+        'views/face_scan_template.xml',  
         'views/lich_su_cong_tac.xml',
         'views/chung_chi_bang_cap.xml',
         'views/danh_sach_chung_chi_bang_cap.xml',
@@ -40,4 +41,9 @@
     'demo': [
         'demo/demo.xml',
     ],
+    'assets': {
+    'web.assets_backend': [
+        'nhan_su/static/src/css/style.css',
+    ],
+},
 }

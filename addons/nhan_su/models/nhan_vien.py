@@ -10,7 +10,6 @@ class NhanVien(models.Model):
     _order = 'ten asc, tuoi desc'
 
     ma_dinh_danh = fields.Char("Mã định danh", required=True)
-
     ho_ten_dem = fields.Char("Họ tên đệm", required=True)
     ten = fields.Char("Tên", required=True)
     ho_va_ten = fields.Char("Họ và tên", compute="_compute_ho_va_ten", store=True)
@@ -79,3 +78,11 @@ class NhanVien(models.Model):
         for record in self:
             if record.tuoi < 18:
                 raise ValidationError("Tuổi không được bé hơn 18")
+
+def action_face_recognition(self):
+    # Hàm này chỉ làm nhiệm vụ mở đường dẫn, không nạp AI nên cực nhẹ
+    return {
+        'type': 'ir.actions.act_url',
+        'url': '/nhan_su/face_scan/%s' % self.id,
+        'target': 'new',
+    }

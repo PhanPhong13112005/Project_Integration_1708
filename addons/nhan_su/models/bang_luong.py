@@ -1,5 +1,7 @@
 # file: nhan_su/models/bang_luong.py
+import requests
 from odoo import models, fields, api
+from odoo.exceptions import UserError
 from datetime import date
 import calendar
 
@@ -50,3 +52,38 @@ class BangLuong(models.Model):
             luong_1_ngay = (r.luong_co_ban or 5000000) / 26
             tien_phat = r.so_lan_di_muon * 50000
             r.tong_thuc_linh = (luong_1_ngay * r.tong_ngay_cong) - tien_phat
+            
+    def action_send_telegram_luong(self):
+        bot_token = '8787593911:AAHJ0l2vXpxqoEv0l2ZWvCT6zLJPa_FVPbw'
+        chat_id = '-1003788848010'
+        
+        for r in self:
+            if not r.tong_thuc_linh:
+                raise UserError("Bảng lương này chưa có thực lĩnh!")
+                
+            # Tạo nội dung tin nhắn
+            message = (f"📢 THÔNG BÁO LƯƠNG T{r.thang}/{r.nam} 📢\n"
+                       f"👤 Nhân viên: {r.nhan_vien_id.ho_va_ten}\n"
+                       f"✅ Tổng ngày công: {r.tong_ngay_cong}\n"
+                       f"⚠️ Số lần đi muộn: {r.so_lan_di_muon}\n"
+                       f"💰 TỔNG THỰC LĨNH: {r.tong_thuc_linh:,.0f} VNĐ")
+            
+            url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+            payload = {"chat_id": chat_id, "text": message}
+            
+            try:
+                response = requests.post(url, json=payload)
+                response.raise_for_status()
+            except Exception as e:
+                raise UserError(f"Lỗi khi gửi Telegram: {str(e)}")
+                
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Thành công',
+                'message': 'Đã gửi thông báo lương qua Telegram!',
+                'type': 'success',
+                'sticky': False,
+            }
+        }

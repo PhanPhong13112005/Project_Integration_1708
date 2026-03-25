@@ -29,24 +29,19 @@
                   action="action_danh_sach_chung_chi_bang_cap"
                   sequence="3"/>
 
-        <menuitem id="menu_nghiep_vu_luong"
-                  name="Chấm công &amp; Lương"
+        <menuitem id="menu_ql_cham_cong"
+                  name="Chấm công và Tính lương"
                   parent="menu_root"
                   sequence="2"/>
 
-        <menuitem id="menu_du_bao_ai" 
-                  name="Phân tích &amp; Dự báo" 
-                  parent="menu_root" 
-                  sequence="3"/>
-        
         <menuitem id="menu_du_bao_action" 
-                  name="Dự báo Nghỉ việc (AI)" 
-                  parent="menu_du_bao_ai" 
-                  action="action_du_bao"
-                  sequence="1"/>
+                  name="Dự báo Nghỉ việc AI" 
+                  parent="menu_root" 
+                  action="action_du_bao_nghi_viec" 
+                  sequence="3"/>
 
         <menuitem id="menu_configuration"
-                  name="Danh mục &amp; Cấu hình"
+                  name="Cấu hình"
                   parent="menu_root"
                   sequence="100"/>
 

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="face_scan_template">
+        <t t-name="face_scan_template_view">
+            <html>
+                <head>
+                    <title>AI Face Check-in</title>
+                    <style>
+                        body { text-align: center; background: #1a1a1a; color: white; font-family: sans-serif; padding-top: 50px; }
+                        video { border: 5px solid #00A09D; border-radius: 15px; background: black; }
+                        #s { font-size: 20px; font-weight: bold; margin-top: 20px; min-height: 80px; }
+                    </style>
+                </head>
+                <body>
+                    <h2>HỆ THỐNG ĐIỂM DANH AI</h2>
+                    <video id="v" width="480" height="360" autoplay="true" playsinline="true" muted="muted"></video>
+                    <canvas id="c" width="480" height="360" style="display:none;"></canvas>
+                    <div id="s">Đang khởi động Camera...</div>
+
+                    <script type="text/javascript">
+                        // Dùng biến toàn cục để tránh xung đột
+                        var scanner;
+                        var isFinished = false;
+
+                        window.onload = function() {
+                            const v = document.getElementById('v');
+                            const c = document.getElementById('c');
+                            const s = document.getElementById('s');
+
+                            navigator.mediaDevices.getUserMedia({video: true}).then(function(stream) {
+                                v.srcObject = stream;
+                                s.innerText = "Đang quét khuôn mặt...";
+                                s.style.color = "#00A09D";
+
+                                scanner = setInterval(function() {
+                                    if (isFinished) return;
+
+                                    c.getContext('2d').drawImage(v, 0, 0, 480, 360);
+                                    var imgData = c.toDataURL('image/jpeg');
+
+                                    fetch('/nhan_su/face_recognize', {
+                                        method: 'POST',
+                                        headers: {'Content-Type': 'application/json'},
+                                        body: JSON.stringify({params: {image_data: imgData}})
+                                    }).then(function(r) { return r.json(); }).then(function(data) {
+                                        if (!data.result || isFinished) return;
+                                        
+                                        var res = data.result;
+                                        if (res.status === 'success') {
+                                            isFinished = true;
+                                            s.innerHTML = "🌟 XIN CHÀO: " + res.emp_name + "&lt;br/&gt;ĐÃ ĐIỂM DANH THÀNH CÔNG!";
+                                            s.style.color = "#2ecc71";
+                                            stopSystem(stream, 2500);
+                                        } else if (res.message.indexOf('hoàn thành') !== -1 || res.message.indexOf('Hẹn gặp lại') !== -1) {
+                                            isFinished = true;
+                                            s.innerHTML = "ℹ️ " + res.message;
+                                            s.style.color = "#f1c40f";
+                                            stopSystem(stream, 5000);
+                                        } else {
+                                            s.innerText = res.message;
+                                            s.style.color = "#e74c3c";
+                                            setTimeout(function() {
+                                                if (!isFinished) {
+                                                    s.innerText = "Đang quét lại...";
+                                                    s.style.color = "#3498db";
+                                                }
+                                            }, 1500);
+                                        }
+                                    });
+                                }, 2500);
+                            });
+
+                            function stopSystem(stream, delay) {
+                                clearInterval(scanner);
+                                if (stream) {
+                                    stream.getTracks().forEach(function(t) { t.stop(); });
+                                }
+                                setTimeout(function() { window.close(); }, delay);
+                            }
+                        };
+                    </script>
+                </body>
+            </html>
+        </t>
+    </template>
+</odoo>

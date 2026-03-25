@@ -1,19 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <record id="view_du_bao_graph" model="ir.ui.view">
+            <field name="name">ns.du.bao.graph</field>
+            <field name="model">ns.du.bao</field>
+            <field name="arch" type="xml">
+                <graph string="Biểu đồ Phân tích Rủi ro Nghỉ việc" type="bar" sample="1">
+                    <field name="nhan_vien_id" type="row"/>
+                    <field name="diem_rui_ro" type="measure"/>
+                </graph>
+            </field>
+        </record>
+
         <record id="view_du_bao_tree" model="ir.ui.view">
             <field name="name">ns.du.bao.tree</field>
             <field name="model">ns.du.bao</field>
             <field name="arch" type="xml">
-                <tree string="Dự báo nghỉ việc" decoration-danger="muc_do_canh_bao == 'cao'" decoration-warning="muc_do_canh_bao == 'trung_binh'" decoration-success="muc_do_canh_bao == 'thap'">
-                    <field name="nhan_vien_id"/>
-                    <field name="luong_hien_tai" widget="monetary"/>
-                    <field name="so_lan_di_muon_thang_nay"/>
-                    <field name="diem_rui_ro" widget="progressbar"/>
+                <tree string="Danh sách dự báo" decoration-danger="muc_do_canh_bao=='nguy_hiem'" decoration-warning="muc_do_canh_bao=='canh_bao'">
+                    <header>
+                        <button name="action_chay_du_bao_hang_loat" type="object" string="🚀 AI Quét Dự báo Toàn bộ Công ty" class="btn-danger"/>
+                    </header>
+                    <field name="nhan_vien_id" widget="many2one_avatar"/>
+                    <field name="so_gio_lam"/>
+                    <field name="so_lan_muon"/>
+                    <field name="nghi_khong_phep"/>
+                    <field name="diem_rui_ro" widget="progressbar" string="Tỷ lệ rủi ro"/>
                     <field name="muc_do_canh_bao" widget="badge" 
-                           decoration-danger="muc_do_canh_bao == 'cao'" 
-                           decoration-warning="muc_do_canh_bao == 'trung_binh'" 
-                           decoration-success="muc_do_canh_bao == 'thap'"/>
+                           decoration-success="muc_do_canh_bao == 'an_toan'"
+                           decoration-warning="muc_do_canh_bao == 'canh_bao'"
+                           decoration-danger="muc_do_canh_bao == 'nguy_hiem'"/>
                 </tree>
             </field>
         </record>
@@ -22,49 +37,36 @@
             <field name="name">ns.du.bao.form</field>
             <field name="model">ns.du.bao</field>
             <field name="arch" type="xml">
-                <form>
-                    <header>
-                          <button string="Chạy Phân tích AI" 
-                            type="object" 
-                            name="action_analyze_risk" 
-                            class="oe_highlight"/>
-                    </header>
+                <form string="Hồ sơ phân tích AI">
                     <sheet>
                         <div class="oe_title">
-                            <h1><field name="nhan_vien_id" placeholder="Chọn nhân viên để phân tích..."/></h1>
+                            <h1>HỒ SƠ PHÂN TÍCH NHÂN SỰ AI</h1>
                         </div>
                         <group>
-                            <group string="Dữ liệu đầu vào (Features)">
-                                <field name="luong_hien_tai"/>
-                                <field name="so_lan_di_muon_thang_nay"/>
-                                <field name="tham_nien_thang"/>
+                            <group string="Dữ liệu đầu vào">
+                                <field name="nhan_vien_id" widget="many2one_avatar" options="{'no_create': True}"/>
+                                <field name="so_gio_lam"/>
+                                <field name="so_lan_muon"/>
+                                <field name="nghi_khong_phep"/>
                             </group>
-                            <group string="Kết quả Dự báo (Prediction)">
-                                <field name="diem_rui_ro" widget="percentpie"/>
-                                <field name="muc_do_canh_bao" widget="badge" decoration-danger="muc_do_canh_bao == 'cao'"/>
+                            <group string="Kết quả AI Chẩn đoán">
+                                <field name="diem_rui_ro" widget="progressbar"/>
+                                <field name="muc_do_canh_bao" widget="badge" 
+                                       decoration-success="muc_do_canh_bao == 'an_toan'"
+                                       decoration-warning="muc_do_canh_bao == 'canh_bao'"
+                                       decoration-danger="muc_do_canh_bao == 'nguy_hiem'"/>
+                                <field name="phan_tich_chi_tiet" readonly="1"/>
                             </group>
                         </group>
-                        <separator string="Phân tích chi tiết nguyên nhân"/>
-                        <field name="phan_tich_chi_tiet" readonly="1"/>
                     </sheet>
                 </form>
             </field>
         </record>
 
-        <record id="action_du_bao" model="ir.actions.act_window">
-            <field name="name">Dự báo Nghỉ việc (AI)</field>
+        <record id="action_du_bao_nghi_viec" model="ir.actions.act_window">
+            <field name="name">AI Dự báo Nghỉ việc</field>
             <field name="res_model">ns.du.bao</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">graph,tree,form</field>
         </record>
-
-        <menuitem id="menu_du_bao_ai" 
-                  name="Phân tích &amp; Dự báo" 
-                  parent="menu_root" 
-                  sequence="90"/>
-        
-        <menuitem id="menu_du_bao_action" 
-                  name="Dự báo Nghỉ việc" 
-                  parent="menu_du_bao_ai" 
-                  action="action_du_bao"/>
     </data>
 </odoo>

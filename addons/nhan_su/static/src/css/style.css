@@ -1,0 +1,9 @@
+/* Ép màu xám/trắng cho dòng tổng kết ở cuối bảng */
+.o_list_table tfoot {
+    color: #cccccc !important; /* Màu xám sáng */
+    background-color: #333333 !important;
+}
+
+.o_list_table tfoot tr td {
+    color: #ffffff !important; /* Chữ trắng cho các con số tổng */
+}
