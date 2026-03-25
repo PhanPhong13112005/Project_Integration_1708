@@ -37,7 +37,7 @@
         <menuitem id="menu_du_bao_action" 
                   name="Dự báo Nghỉ việc AI" 
                   parent="menu_root" 
-                  action="action_du_bao_nghi_viec" 
+                  action="action_du_bao_nghi_viec"
                   sequence="3"/>
 
         <menuitem id="menu_configuration"

@@ -1,3 +1,4 @@
+# file: nhan_su/models/du_bao.py
 from odoo import models, fields, api
 import os
 import joblib
@@ -9,6 +10,7 @@ class DuBaoNghiViec(models.Model):
     _name = 'ns.du.bao'
     _description = 'Hệ thống AI Dự báo Nhân sự'
 
+    # Thông tin nhân viên
     nhan_vien_id = fields.Many2one('nhan_vien', string='Nhân viên', required=True)
     
     # 3 thông số đầu vào cho AI
@@ -25,7 +27,7 @@ class DuBaoNghiViec(models.Model):
     ], string='Mức độ', compute='_compute_ai_predict', store=True)
     phan_tich_chi_tiet = fields.Text(string='AI Phân tích', compute='_compute_ai_predict', store=True)
 
-    # --- HÀM 1: DỰ BÁO TỰ ĐỘNG KHI NHẬP TAY (FORM VIEW) ---
+    # --- HÀM 1: DỰ BÁO TỰ ĐỘNG KHI CÓ DỮ LIỆU (COMPUTE) ---
     @api.depends('so_gio_lam', 'so_lan_muon', 'nghi_khong_phep')
     def _compute_ai_predict(self):
         base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -45,58 +47,48 @@ class DuBaoNghiViec(models.Model):
                 continue
 
             input_data = [[r.so_gio_lam, r.so_lan_muon, r.nghi_khong_phep]]
+            # AI tính toán xác suất
             prob = model.predict_proba(input_data)[0][1] * 100
             
             r.diem_rui_ro = prob
             if prob < 30:
                 r.muc_do_canh_bao = 'an_toan'
-                r.phan_tich_chi_tiet = "✅ Nhân viên có biểu hiện tốt, gắn bó với công ty. Cần tiếp tục phát huy."
+                r.phan_tich_chi_tiet = "✅ Nhân viên gắn bó tốt. Cần tiếp tục duy trì chính sách đãi ngộ."
             elif prob < 70:
                 r.muc_do_canh_bao = 'canh_bao'
-                r.phan_tich_chi_tiet = "⚠️ Dấu hiệu chán việc nhẹ. Cần quản lý hỏi thăm, động viên."
+                r.phan_tich_chi_tiet = "⚠️ Có dấu hiệu lơ là công việc. Quản lý nên gặp mặt trao đổi."
             else:
                 r.muc_do_canh_bao = 'nguy_hiem'
-                r.phan_tich_chi_tiet = f"🚨 CẢNH BÁO ĐỎ: Nguy cơ nghỉ việc lên tới {prob:.1f}%. Đề nghị HR can thiệp ngay!"
+                r.phan_tich_chi_tiet = f"🚨 CẢNH BÁO: Nguy cơ nghỉ việc rất cao ({prob:.1f}%). Cần có phương án thay thế hoặc giữ chân gấp!"
 
-    # --- HÀM 2: AI QUÉT TOÀN BỘ CÔNG TY (TREE VIEW / NÚT ĐỎ) ---
+    # --- HÀM 2: AI QUÉT TOÀN BỘ CÔNG TY (DÙNG CHO NÚT BẤM) ---
     @api.model
     def action_chay_du_bao_hang_loat(self):
-        # 1. Xóa hết dữ liệu cũ trên bảng để làm mới
+        # Xóa dữ liệu cũ
         self.search([]).unlink()
         
-        # 2. Lấy danh sách toàn bộ nhân viên
         nhan_viens = self.env['nhan_vien'].search([])
-        
         for nv in nhan_viens:
-            # Tìm lịch sử chấm công của nhân viên này
+            # Lấy lịch sử từ bảng cham_cong
             ccs = self.env['cham_cong'].search([('nhan_vien_id', '=', nv.id)])
             if not ccs:
-                continue # Nếu người này chưa từng chấm công thì bỏ qua
+                continue
                 
             tong_gio = sum(ccs.mapped('so_gio_lam'))
             so_lan_muon = len(ccs.filtered(lambda x: x.di_muon == True))
             
-            # Tạo bản ghi dự báo mới, Odoo sẽ tự động gọi hàm _compute_ai_predict ở trên
             self.create({
                 'nhan_vien_id': nv.id,
                 'so_gio_lam': tong_gio,
                 'so_lan_muon': so_lan_muon,
-                'nghi_khong_phep': 0, # Tạm mặc định là 0
+                'nghi_khong_phep': 0,
             })
-    # BỔ SUNG HÀM NÀY VÀO CLASS DuBaoNghiViec
+
+    # --- HÀM 3: TỰ ĐỘNG LẤY DỮ LIỆU CHO 1 BẢN GHI ---
     def action_tu_dong_lay_du_lieu(self):
         for r in self:
             if r.nhan_vien_id:
-                # Tìm tất cả lịch sử chấm công của nhân viên này
-                cac_buoi_lam = self.env['cham_cong'].search([
-                    ('nhan_vien_id', '=', r.nhan_vien_id.id)
-                ])
-                
-                # Tính tổng
-                tong_gio = sum(cac_buoi_lam.mapped('so_gio_lam'))
-                so_lan_muon = len(cac_buoi_lam.filtered(lambda x: x.di_muon == True))
-                
-                # Điền vào form, _compute_ai_predict sẽ tự động chạy theo
-                r.so_gio_lam = tong_gio
-                r.so_lan_muon = so_lan_muon
+                ccs = self.env['cham_cong'].search([('nhan_vien_id', '=', r.nhan_vien_id.id)])
+                r.so_gio_lam = sum(ccs.mapped('so_gio_lam'))
+                r.so_lan_muon = len(ccs.filtered(lambda x: x.di_muon == True))
                 r.nghi_khong_phep = 0

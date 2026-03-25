@@ -5,7 +5,7 @@
             <field name="name">ns.du.bao.graph</field>
             <field name="model">ns.du.bao</field>
             <field name="arch" type="xml">
-                <graph string="Biểu đồ Phân tích Rủi ro Nghỉ việc" type="bar" sample="1">
+                <graph string="Biểu đồ Phân tích Rủi ro Nghỉ việc" type="bar">
                     <field name="nhan_vien_id" type="row"/>
                     <field name="diem_rui_ro" type="measure"/>
                 </graph>
@@ -23,12 +23,11 @@
                     <field name="nhan_vien_id" widget="many2one_avatar"/>
                     <field name="so_gio_lam"/>
                     <field name="so_lan_muon"/>
-                    <field name="nghi_khong_phep"/>
-                    <field name="diem_rui_ro" widget="progressbar" string="Tỷ lệ rủi ro"/>
+                    <field name="diem_rui_ro" widget="progressbar" string="Tỷ lệ rủi ro (%)"/>
                     <field name="muc_do_canh_bao" widget="badge" 
-                           decoration-success="muc_do_canh_bao == 'an_toan'"
-                           decoration-warning="muc_do_canh_bao == 'canh_bao'"
-                           decoration-danger="muc_do_canh_bao == 'nguy_hiem'"/>
+                           attrs="{'decoration-success': [('muc_do_canh_bao', '=', 'an_toan')],
+                                   'decoration-warning': [('muc_do_canh_bao', '=', 'canh_bao')],
+                                   'decoration-danger': [('muc_do_canh_bao', '=', 'nguy_hiem')]}"/>
                 </tree>
             </field>
         </record>
@@ -38,23 +37,23 @@
             <field name="model">ns.du.bao</field>
             <field name="arch" type="xml">
                 <form string="Hồ sơ phân tích AI">
+                    <header>
+                        <button name="action_tu_dong_lay_du_lieu" string="🤖 Lấy số liệu Chấm công" type="object" class="oe_highlight"/>
+                    </header>
                     <sheet>
-                        <div class="oe_title">
-                            <h1>HỒ SƠ PHÂN TÍCH NHÂN SỰ AI</h1>
-                        </div>
                         <group>
                             <group string="Dữ liệu đầu vào">
-                                <field name="nhan_vien_id" widget="many2one_avatar" options="{'no_create': True}"/>
+                                <field name="nhan_vien_id" options="{'no_create': True}"/>
                                 <field name="so_gio_lam"/>
                                 <field name="so_lan_muon"/>
                                 <field name="nghi_khong_phep"/>
                             </group>
-                            <group string="Kết quả AI Chẩn đoán">
+                            <group string="Kết quả AI">
                                 <field name="diem_rui_ro" widget="progressbar"/>
                                 <field name="muc_do_canh_bao" widget="badge" 
-                                       decoration-success="muc_do_canh_bao == 'an_toan'"
-                                       decoration-warning="muc_do_canh_bao == 'canh_bao'"
-                                       decoration-danger="muc_do_canh_bao == 'nguy_hiem'"/>
+                                       attrs="{'decoration-success': [('muc_do_canh_bao', '=', 'an_toan')],
+                                               'decoration-warning': [('muc_do_canh_bao', '=', 'canh_bao')],
+                                               'decoration-danger': [('muc_do_canh_bao', '=', 'nguy_hiem')]}"/>
                                 <field name="phan_tich_chi_tiet" readonly="1"/>
                             </group>
                         </group>
